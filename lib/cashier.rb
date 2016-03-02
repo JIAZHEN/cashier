@@ -25,11 +25,19 @@ module Cashier
   def self.scan(input = [])
     input.reduce({}) do |result, code|
       barcode, qty = code.split("-")
-      sku = result[barcode] || result[barcode] = { total: 0, qty: 0, price: self.items[barcode].price }
+      sku = result[barcode] || result[barcode] = { qty: 0, price: self.items[barcode].price }
       sku[:qty] = sku[:qty] + (qty ? qty.to_i : 1)
       sku[:total] = sku[:qty] * sku[:price]
+      sku[:discounted_total] = sku[:total]
       result
     end
+  end
+
+  def self.checkout(cart)
+    self.promotions.each do |promotion|
+      promotion.apply_to(cart) if promotion.can_apply?(cart)
+    end
+    cart
   end
 
 end

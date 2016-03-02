@@ -8,12 +8,6 @@ module Cashier
       @savings = 0
     end
 
-    def checkout
-      Cashier.promotions.each do |promotion|
-        promotion.apply_to(self) if promotion.can_apply?(self)
-      end
-    end
-
     def print
       output = ""
       output << items_content

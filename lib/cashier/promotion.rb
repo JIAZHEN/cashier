@@ -1,6 +1,6 @@
 module Cashier
   class Promotion
-    attr_reader :criteria
+    attr_reader :barcode, :qty
 
     def initialize(barcode:, qty:, &block)
       @barcode = barcode
@@ -8,12 +8,12 @@ module Cashier
       @block = block
     end
 
-    def can_apply?(items)
-      items[key][:qty] && items[key][:qty] >= value
+    def can_apply?(cart)
+      cart.items[barcode][:qty] && cart.items[barcode][:qty] >= qty
     end
 
-    def apply_to(items)
-      block.call(items)
+    def apply_to(cart)
+      @block.call(cart, barcode, qty)
     end
   end
 end
