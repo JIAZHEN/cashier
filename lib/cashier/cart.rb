@@ -15,28 +15,53 @@ module Cashier
     end
 
     def print
-      checkout
       output = ""
-      output << "***<#{COMPANY_NAME}商店>购物清单***\n".freeze
+      output << items_content
+      output << promotions_content
+      output << summary_content
+    end
+
+    private
+
+    def items_content
+      content = ""
+      content << "***<#{COMPANY_NAME}>购物清单***\n".freeze
       items.each do |barcode, info|
         item = Cashier.items[barcode]
-        output << "名称：#{item.name}，数量：#{info[:qty]}#{item.unit}，单价：#{info[:price]}(元)，小计：#{info[:discounted_total]}(元)"
-        output << "，节省#{info[:saving]}(元)" if info[:saving]
+        content << "名称：#{item.name}，数量：#{info[:qty]}#{item.unit}，单价：#{format(info[:price])}(元)，小计：#{format(info[:discounted_total])}(元)"
+        content << "，节省#{format(info[:saving])}(元)" if info[:saving]
+        content << "\n".freeze
       end
+      content
+    end
 
+    def promotions_content
+      content = ""
       unless promoted_items.empty?
-        output << "----------------------\n".freeze
-        output << "买二赠一商品：\n".freeze
+        content << "----------------------\n".freeze
+        content << "买二赠一商品：\n".freeze
         promoted_items.each do |barcode, qty|
           item = Cashier.items[barcode]
-          output << "名称：#{item.name}，数量：#{info[:qty]}#{item.unit}\n"
+          content << "名称：#{item.name}，数量：#{qty}#{item.unit}\n"
         end
       end
+      content
+    end
 
-      output << "----------------------\n".freeze
-      output << "总计：#{total || '0.00'}(元)\n"
-      output << "节省：#{savings}(元)\n" if savings > 0
-      output << "**********************\n".freeze
+    def summary_content
+      content = ""
+      content << "----------------------\n".freeze
+      content << "总计：#{format(total)}(元)\n"
+      content << "节省：#{format(savings)}(元)\n" if savings > 0
+      content << "**********************\n".freeze
+    end
+
+    def total
+      items.reduce(0) { |result, (_, info)| result + info[:discounted_total] }
+    end
+
+    def format(number)
+      "%.2f" % number
     end
   end
 end
