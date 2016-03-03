@@ -3,9 +3,6 @@ require_relative "cashier/promotion"
 require_relative "cashier/receipt_template"
 
 module Cashier
-
-  COMPANY_NAME = "My Shop"
-
   def self.items=(items)
     @items = items
   end
@@ -36,11 +33,11 @@ module Cashier
   def self.sum(data, promoted_items)
     data.reduce({ total: 0, savings: 0}) do |result, (barcode, info)|
       result[:total] = result[:total] +
-        (info[:qty] - (promoted_items[barcode][:qty] || 0)) * info[:price] -
+        (info[:qty] - (promoted_items[barcode] || 0)) * info[:price] -
         (info[:saving] || 0)
 
       result[:savings] = result[:savings] +
-        (promoted_items[barcode][:qty] || 0) * info[:price] +
+        (promoted_items[barcode] || 0) * info[:price] +
         (info[:saving] || 0)
       result
     end
@@ -50,7 +47,7 @@ module Cashier
     data, promoted_items = self.scan(input), {}
 
     data.each do |barcode, info|
-      promotion = self.promotions.detect { |p| p.can_apply?(info) }
+      promotion = self.promotions.detect { |p| p.can_apply?(barcode, info) }
       promotion.apply_to(info, promoted_items) if promotion
     end
 
@@ -58,4 +55,5 @@ module Cashier
     { items: data, promoted_items: promoted_items }.merge(summary)
   end
 
+  private_class_method :sum, :scan
 end

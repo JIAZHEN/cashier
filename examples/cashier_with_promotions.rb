@@ -7,31 +7,38 @@ Cashier.items = {
 }
 
 Cashier.promotions = [
-  Cashier::Promotion.new(barcode: "ITEM000001", qty: 3) do |info, promoted_items|
-    cart_info = cart.items[barcode]
-    cart_info[:discounted_total] = cart_info[:price] * (cart_info[:qty] - cart_info[:qty] / qty)
-    cart.savings = cart.savings + cart_info[:total] - cart_info[:discounted_total]
-    cart.promoted_items[barcode] = cart_info[:qty] / qty
+  Cashier::Promotion.new(barcode: "ITEM000001", qty: 1) do |info, promoted_items, promotion|
+    info[:total] = info[:price] * info[:qty] * 0.95
+    info[:saving] = info[:price] * info[:qty] * 0.05
   end,
 
-  Cashier::Promotion.new(barcode: "ITEM000003", qty: 1) do |cart, barcode, qty|
-    cart_info = cart.items[barcode]
-    cart_info[:discounted_total] = cart_info[:price] * cart_info[:qty] * 0.95
-    cart_info[:saving] = cart_info[:total] - cart_info[:discounted_total]
-    cart.savings = cart.savings + cart_info[:saving]
+  Cashier::Promotion.new(barcode: "ITEM000001", qty: 3) do |info, promoted_items, promotion|
+    promoted_items[promotion.barcode] = info[:qty] / promotion.qty
+    info[:total] = info[:price] * (info[:qty] - info[:qty] / promotion.qty)
+  end,
+
+  Cashier::Promotion.new(barcode: "ITEM000003", qty: 1) do |info, promoted_items, promotion|
+    info[:total] = info[:price] * info[:qty] * 0.95
+    info[:saving] = info[:price] * info[:qty] * 0.05
+  end,
+
+  Cashier::Promotion.new(barcode: "ITEM000005", qty: 3) do |info, promoted_items, promotion|
+    promoted_items[promotion.barcode] = info[:qty] / promotion.qty
+    info[:total] = info[:price] * (info[:qty] - info[:qty] / promotion.qty)
   end
 ]
 
 input = [
-  "ITEM000001",
-  "ITEM000001",
-  "ITEM000001",
-  "ITEM000001",
-  "ITEM000001",
-  "ITEM000003-2",
   "ITEM000005",
   "ITEM000005",
-  "ITEM000005"
+  "ITEM000005",
+  "ITEM000001",
+  "ITEM000001",
+  "ITEM000001",
+  "ITEM000001",
+  "ITEM000001",
+  "ITEM000001",
+  "ITEM000003-2"
 ]
 
 data = Cashier.checkout(input)
