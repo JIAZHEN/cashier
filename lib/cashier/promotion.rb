@@ -9,7 +9,7 @@ module Cashier
     end
 
     def can_apply?(barcode, info)
-      barcode == self.barcode && info[:qty] && info[:qty] >= qty
+      barcode == self.barcode && !info[:qty].nil? && info[:qty] >= qty
     end
 
     def apply_to(info, promoted_items)
