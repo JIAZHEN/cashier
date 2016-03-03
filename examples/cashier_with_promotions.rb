@@ -7,7 +7,7 @@ Cashier.items = {
 }
 
 Cashier.promotions = [
-  Cashier::Promotion.new(barcode: "ITEM000001", qty: 3) do |cart, barcode, qty|
+  Cashier::Promotion.new(barcode: "ITEM000001", qty: 3) do |info, promoted_items|
     cart_info = cart.items[barcode]
     cart_info[:discounted_total] = cart_info[:price] * (cart_info[:qty] - cart_info[:qty] / qty)
     cart.savings = cart.savings + cart_info[:total] - cart_info[:discounted_total]
@@ -34,7 +34,5 @@ input = [
   "ITEM000005"
 ]
 
-items = Cashier.scan(input)
-cart = Cashier::Cart.new(items)
-cart = Cashier.checkout(cart)
-puts cart.print
+data = Cashier.checkout(input)
+Cashier::ReceiptTemplate.new("JZ's Shop", data).print

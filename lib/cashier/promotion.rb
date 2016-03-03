@@ -8,12 +8,12 @@ module Cashier
       @block = block
     end
 
-    def can_apply?(cart)
-      cart.items[barcode][:qty] && cart.items[barcode][:qty] >= qty
+    def can_apply?(info)
+      info[:qty] && info[:qty] >= qty
     end
 
-    def apply_to(cart)
-      @block.call(cart, barcode, qty)
+    def apply_to(info, promoted_items)
+      @block.call(info, promoted_items)
     end
   end
 end
