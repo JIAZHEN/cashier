@@ -1,4 +1,3 @@
-require_relative "../lib/cashier"
 require "spec_helper"
 
 describe Cashier do
@@ -31,9 +30,9 @@ describe Cashier do
 
     context "when input is provided" do
       let(:result) {{
-        "ITEM000001" => { total: 5, qty: 5, price: 1 },
-        "ITEM000003" => { total: 11, qty: 2, price: 5.5 },
-        "ITEM000005" => { total: 9, qty: 3, price: 3 }
+        "ITEM000001" => { total: 5, qty: 5, price: 1, discounted_total: 5 },
+        "ITEM000003" => { total: 11, qty: 2, price: 5.5, discounted_total: 11 },
+        "ITEM000005" => { total: 9, qty: 3, price: 3, discounted_total: 9 }
       }}
 
       it "groups input with barcode and counts" do

@@ -1,4 +1,3 @@
-require_relative "../lib/cashier"
 require "spec_helper"
 
 describe Cashier::Cart do
