@@ -16,14 +16,14 @@ module Cashier
   end
 
   def self.promotions
-    @promotions
+    @promotions ||= []
   end
 
   def self.scan(input = [])
     input.reduce({}) do |data, code|
       barcode, qty = code.split("-")
       item = self.items[barcode]
-      info = data[barcode] || data[barcode] = { qty: 0, price: item.price, name: item.name, total: 0 }
+      info = data[barcode] || data[barcode] = { qty: 0, price: item.price, name: item.name, total: 0, unit: item.unit }
       info[:qty] = info[:qty] + (qty ? qty.to_i : 1)
       info[:total] = info[:qty] * info[:price]
       data
@@ -44,14 +44,14 @@ module Cashier
   end
 
   def self.checkout(input = [])
-    data, promoted_items = self.scan(input), {}
+    data, promoted_items = scan(input), {}
 
     data.each do |barcode, info|
       promotion = self.promotions.detect { |p| p.can_apply?(barcode, info) }
       promotion.apply_to(info, promoted_items) if promotion
     end
 
-    summary = self.sum(data, promoted_items)
+    summary = sum(data, promoted_items)
     { items: data, promoted_items: promoted_items }.merge(summary)
   end
 
